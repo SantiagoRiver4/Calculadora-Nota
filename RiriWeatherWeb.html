@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!-- Definición del juego de caracteres y configuración de la escala del viewport -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UninpahuSponsor Riri Weather</title>
+    <!-- Enlace a la fuente de Google Fonts y al archivo CSS de Font Awesome -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <!-- Enlace al script de Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        /* Estilos globales de la página */
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: #000000;
+            color: #000000;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Estilos del contenedor principal */
+        .container {
+            background-color: rgba(255, 255, 255, 0.8);
+            border-radius: 10px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            padding: 20px; /* Reducir el padding */
+            text-align: center;
+            width: 80%;
+            max-width: 400px; /* Reducir el ancho máximo */
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Estilos del título principal */
+        h1 {
+            font-size: 1.8em; /* Reducir el tamaño del título */
+            margin-bottom: 10px; /* Reducir el margen inferior del título */
+            color: #000000;
+            font-weight: 700;
+        }
+
+        /* Estilos del contenedor de selección */
+        .select-container {
+            margin-bottom: 10px; /* Reducir el margen inferior del contenedor de selección */
+            text-align: center;
+        }
+
+        /* Estilos del elemento select */
+        select {
+            padding: 8px; /* Reducir el relleno del select */
+            font-size: 14px; /* Reducir el tamaño de fuente del select */
+            background-color: #f5f5f5;
+            color: #1b0202;
+            border: none;
+            border-radius: 5px;
+            appearance: none;
+            outline: none;
+        }
+
+        /* Estilos del botón */
+        button {
+            padding: 8px 16px; /* Reducir el relleno del botón */
+            font-size: 14px; /* Reducir el tamaño de fuente del botón */
+            background-color: #3498db;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            outline: none;
+        }
+
+        /* Estilos del botón en hover */
+        button:hover {
+            background-color: #2980b9;
+        }
+
+        /* Estilos de la tarjeta de clima */
+        .weather-card {
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+            background-color: #ffffff;
+            color: #000000;
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Estilos del subtítulo de la tarjeta de clima */
+        .weather-card h2 {
+            font-size: 1.5em; /* Reducir el tamaño del subtítulo */
+            margin-bottom: 10px; /* Reducir el margen inferior del subtítulo */
+            color: #000000;
+            font-weight: 700;
+        }
+
+        /* Estilos del párrafo de la tarjeta de clima */
+        .weather-card p {
+            font-size: 1em; /* Reducir el tamaño de fuente del párrafo */
+            margin: 8px 0; /* Reducir el margen del párrafo */
+            color: #000000;
+        }
+
+        /* Estilos del ícono del clima */
+        .weather-icon {
+            font-size: 2em; /* Reducir el tamaño del ícono del clima */
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        /* Estilos del fondo animado */
+        .background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+            animation: moveBackground 60s linear infinite;
+        }
+
+        /* Estilos del ícono de reloj */
+        .clock-icon {
+            font-size: 1.5em; /* Reducir el tamaño del ícono de reloj */
+            margin-bottom: 10px;
+        }
+        
+        /* Animación del fondo */
+        @keyframes moveBackground {
+            0% {
+                transform: translateX(0) translateY(0);
+            }
+
+            100% {
+                transform: translateX(-50%) translateY(-50%);
+            }
+        }
+    </style>
+
+</head>
+
+<body>
+    <div class="background"></div>
+    <div class="container">
+        <!-- Título principal -->
+        <h1>UNINPAHU RIRI WEATHER</h1>
+        <!-- Contenedor de selección de país -->
+        <div class="select-container">
+            <label for="country-select">Choose a Location:</label>
+            <!-- Selector de país -->
+            <select id="country-select">
+                <option value="0">USA</option>
+                <option value="1">Canada</option>
+                <option value="2">Mexico</option>
+                <option value="3">France</option>
+                <option value="4">Germany</option>
+                <option value="5">Russia</option>
+                <option value="6">Australia</option>
+                <option value="7">India</option>
+                <option value="8">China</option>
+                <option value="9">Brazil</option>
+            </select>
+        </div>
+        <!-- Botón para obtener el clima -->
+        <button onclick="updateWeather()">Get Weather</button>
+        <!-- Tarjeta de clima -->
+        <div class="weather-card" id="weather-card">
+            <!-- Subtítulo con el nombre del país -->
+            <h2>Location: <span id="country-name"></span></h2>
+            <!-- Ícono del clima -->
+            <div class="weather-icon" id="weather-icon"><i class="fas fa-sun"></i></div>
+                        <!-- Temperatura -->
+                        <p>Temperature: <span id="temperature"></span></p>
+                        <!-- Hora local -->
+                        <p>Time <span id="local-time"></span></p>
+                        <!-- Gráfico de temperatura -->
+                        <canvas id="temperature-chart" width="400" height="200"></canvas>
+                    </div>
+                </div>
+            
+                <!-- Script de JavaScript -->
+                <script>
+                    // Arreglo de países con sus respectivas coordenadas geográficas
+                    const countries = [
+                        { country: 'USA', lat: 37.7749, lon: -122.4194 }, // San Francisco
+                        { country: 'Canada', lat: 45.4215, lon: -75.6972 }, // Ottawa
+                        { country: 'Mexico', lat: 19.4326, lon: -99.1332 }, // Mexico City
+                        { country: 'France', lat: 48.8566, lon: 2.3522 }, // Paris
+                        { country: 'Germany', lat: 52.5200, lon: 13.4050 }, // Berlin
+                        { country: 'Russia', lat: 55.7558, lon: 37.6173 }, // Moscow
+                        { country: 'Australia', lat: -33.8688, lon: 151.2093 }, // Sydney
+                        { country: 'India', lat: 28.6139, lon: 77.2090 }, // New Delhi
+                        { country: 'China', lat: 39.9042, lon: 116.4074 }, // Beijing
+                        { country: 'Brazil', lat: -23.5505, lon: -46.6333 } // Sao Paulo
+                    ];
+            
+                    // Función para convertir la temperatura a diferentes escalas
+                    function convertTemperature(tempC, scale) {
+                        switch (scale) {
+                            case 'F':
+                                return (tempC * 9 / 5) + 32;
+                            case 'K':
+                                return tempC + 273.15;
+                            case 'Ra':
+                                return (tempC + 273.15) * 9 / 5;
+                            case 'Re':
+                                return tempC * 4 / 5;
+                            case 'D':
+                                return (100 - tempC) * 3 / 2;
+                            case 'N':
+                                return tempC * 33 / 100;
+                            case 'Ro':
+                                return tempC * 21 / 40 + 7.5;
+                            case 'Le':
+                                return tempC * 10 / 3 + 1;
+                            case 'Gu':
+                                return tempC * 20 / 3 + 5;
+                            default:
+                                return tempC;
+                        }
+                    }
+                    
+                    // Función para limpiar el gráfico de temperatura
+                    function clearTemperatureChart() {
+                        temperatureChart.data.labels = [];
+                        temperatureChart.data.datasets[0].data = [];
+                        temperatureChart.update();
+                    }
+            
+                    // Función asincrónica para obtener datos de clima
+                    async function getWeatherData(lat, lon) {
+                        const response = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`);
+                        const data = await response.json();
+                        return data.current_weather.temperature;
+                    }
+            
+                    // Función para actualizar el clima
+                    async function updateWeather() {
+                        const countrySelect = document.getElementById('country-select');
+                        const selectedIndex = countrySelect.value;
+                        const country = countries[selectedIndex];
+                        const scales = ['C', 'F', 'K', 'Ra', 'Re', 'D', 'N', 'Ro', 'Le', 'Gu'];
+                        const scale = scales[selectedIndex % scales.length];
+            
+                    try {
+                        const temperatureC = await getWeatherData(country.lat, country.lon);
+                        const convertedTemp = convertTemperature(temperatureC, scale);
+                        document.getElementById('country-name').innerText = country.country;
+                        document.getElementById('temperature').innerText = `${convertedTemp.toFixed(2)} °${scale}`;
+                        setWeatherIcon(temperatureC);
+                        clearTemperatureChart();
+                        updateTemperatureChart(country.lat, country.lon);
+                        showLocalTime(country.lat, country.lon); // Mostrar la hora local basada en el país seleccionado
+                    } catch (error) {
+                        console.error('Error fetching weather data:', error);
+                    }
+                    }
+
+                    // Función para establecer el ícono del clima
+                    function setWeatherIcon(temperatureC) {
+                        const weatherIcon = document.getElementById('weather-icon');
+                        if (temperatureC > 20) {
+                            weatherIcon.innerHTML = '<i class="fas fa-sun"></i>';
+                        } else {
+                            weatherIcon.innerHTML = '<i class="fas fa-cloud"></i>';
+                        }
+                    }
+            
+                    // Función para mostrar la hora local
+                    function showLocalTime(lat, lon) {
+                        const date = new Date();
+                        const utc = date.getTime() + (date.getTimezoneOffset() * 60000);
+                        const offset = -5; // UTC-5 para Colombia
+                        const localTime = new Date(utc + (3600000 * offset));
+                        const formattedTime = localTime.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
+                        document.getElementById('local-time').innerText = formattedTime;
+                    }
+                    // Función para crear el gráfico de temperatura
+                    function createTemperatureChart() {
+                        const ctx = document.getElementById('temperature-chart').getContext('2d');
+                        return new Chart(ctx, {
+                            type: 'line',
+                            data: {
+                                labels: [],
+                                datasets: [{
+                                    label: 'Temperature (°C)',
+                                    data: [],
+                                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                                    borderColor: 'rgba(255, 99, 132, 1)',
+                                    borderWidth: 1
+                                }]
+                            },
+                            options: {
+                                scales: {
+                                    y: {
+                                        beginAtZero: false
+                                    }
+                                }
+                            }
+                        });
+                    }
+            
+                    // Creación del gráfico de temperatura
+                    let temperatureChart = createTemperatureChart();
+            
+                    // Función asincrónica para actualizar el gráfico de temperatura
+                    async function updateTemperatureChart(lat, lon) {
+                        try {
+                            const response = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`);
+                            const data = await response.json();
+                            const temperature = data.current_weather.temperature;
+                            const time = new Date(data.current_weather.date * 1000).toLocaleTimeString();
+            
+                            temperatureChart.data.labels.push(time);
+                            temperatureChart.data.datasets[0].data.push(temperature);
+                            temperatureChart.update();
+                        } catch (error) {
+                            console.error('Error fetching weather data:', error);
+                        }
+                    }
+                </script>
+            </body>
+            
+            </html>
+            
